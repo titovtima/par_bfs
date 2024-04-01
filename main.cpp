@@ -3,6 +3,7 @@
 #include "cilk/cilk.h"
 #include <ctime>
 #include <chrono>
+#include <queue>
 
 //#define int long long
 
@@ -100,7 +101,7 @@ vector<int> filter(vector<int> src, function<bool(int)> f) {
 
 vector<int> a;
 
-void bfs(vector<vector<int>> gr) {
+void par_bfs(vector<vector<int>> gr) {
     a = vector<int>(gr.size(), -1);
     vector<vector<int>> f = vector<vector<int>>(gr.size(), vector<int>());
     f[0] = vector<int>(1, 0);
@@ -137,6 +138,22 @@ void bfs(vector<vector<int>> gr) {
 //    return a;
 }
 
+void bfs(vector<vector<int>> gr) {
+    a = vector<int>(gr.size(), -1);
+    queue<int> q = queue<int>();
+    q.push(0);
+    for (int i = 0; !q.empty(); i++) {
+        int v = q.front();
+        q.pop();
+        for (int u : gr[v]) {
+            if (a[u] == -1) {
+                a[u] = i;
+                q.push(u);
+            }
+        }
+    }
+}
+
 signed main() {
 //    p_for(4, 0, []() { cout << "10 "; });
     p_for(4, 0, [](int a) { cout << a << " "; });
@@ -170,7 +187,7 @@ signed main() {
 //    cout << "\n";
 
     chrono::high_resolution_clock::time_point start = chrono::high_resolution_clock::now();
-    bfs(gr);
+    par_bfs(gr);
     chrono::high_resolution_clock::time_point end = chrono::high_resolution_clock::now();
 
     cout << "Done in " << (end - start).count() / 1000000000.0 << " seconds\n";
